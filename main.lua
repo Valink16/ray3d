@@ -34,13 +34,13 @@ function love.load()
 		Vector.new(0, 0, 2)
 	})
 
-	local arr = Vector.new(1, 0, 1):array()
+	local m2 = Matrix.new({
+		Vector.new(1, 0, 0),
+		Vector.new(0, 1, 0),
+		Vector.new(0, 0, 1)
+	}) * 2
 
-	for _, c in ipairs(arr) do
-		print(c)
-	end
-
-	print(m1:vecmul(Vector.new(1, 0, 1)))
+	print(m1 == m2)
 end
 
 function love.draw()
