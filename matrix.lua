@@ -1,5 +1,5 @@
 local module = {
-	_version = "matrix v0.1",
+	_version = "matrix v1.0",
 	_description = "A simple class for matrix operations",
 }
 
@@ -42,10 +42,12 @@ function matrix.__mul(a,b)
 		end
 	else
 		assert(ismatrix(a) and ismatrix(b),  "mul: wrong argument types: (expected <matrix>, <matrix> or <matrix>, <vector> or <matrix>, <number>)")
-		-- TODO: Implement matrix composition
+		for i, bv in ipairs(b) do -- Matrix composition
+			table.insert(vecs, a:vecmul(bv))
+		end
 	end
 
-	new(vecs)
+	return new(vecs)
 end
 
 -- meta function to check if matrices have the same values
