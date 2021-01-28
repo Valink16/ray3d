@@ -5,15 +5,23 @@ Canvas = require "canvas"
 PI = math.pi
 
 function love.load()
-
-	WIDTH, HEIGHT = love.window.getMode()
-
-	local canvas = Canvas(Vector(10, 10), math.pi / 2)
-
-	print(#canvas.rays)
+	Canvas = Canvas(Vector(200, 200), math.pi / 2)
+	Draw_t = 0
+	love.window.setMode(800, 600, {resizable=true})
 end
 
 function love.draw()
-	local s = "Hello, world !"
-	love.graphics.print(s, WIDTH / 2, HEIGHT / 2, love.timer.getTime(), nil, nil, #s * 2.5, 5)
+	local ds = love.timer.getTime()
+
+	Canvas:draw()
+
+	love.graphics.setColor(1, 1, 1)
+	love.graphics.print(tostring(Draw_t))
+
+	Draw_t = love.timer.getTime() - ds
+end
+
+function love.resize()
+	local w, h = love.window.getMode()
+	Canvas.real_res = Vector(w, h)
 end
