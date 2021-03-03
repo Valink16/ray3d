@@ -66,32 +66,20 @@ function canvas:reset_rays()
 
 	local rays_create_s = love.timer.getTime()
 	-- Rays generation
-	local slice = {} -- "Slice" if rays, represents a line of rays(aligned of the x axis) 
-	for i = 0, self.res.x - 1 do
-		local a = i * (self.h_fov / self.res.x) - (self.h_fov / 2)
-		table.insert(slice, Vector(
-			math.sin(a),
-			0,
-			math.cos(a)
-		))
+	local depth_w = (math.cos(self.v_fov / 2) * self.res.y) / (2 * math.sin(self.v_fov / 2))
+	
+	self.rays = {}
+	for y = -self.res.y / 2, self.res.y / 2 - 1 do
+		local slice = {} -- "Slice" if rays, represents a line of rays(aligned of the x axis) 
+		for x = -self.res.x / 2, self.res.x / 2 - 1 do
+			local dir = Vector(x, y, depth_w):norm()
+			table.insert(slice, Ray(dir, Vector()))
+		end
+		table.insert(self.rays, slice)
 	end
+	
 
 	-- The single slice gets rotated many times to get all the rows of rays
-	self.rays = {}
-	for i = self.res.y - 1, 0 , -1 do -- Go in reverse so the first generated slices are from the top
-		local a = i * (self.v_fov / self.res.y) - (self.v_fov / 2) 
-		local rot_mat = Matrix({ -- Rotation matrix around the x axis
-			Vector(1, 0, 0),
-			Vector(0, math.sin(PI/2+a), math.cos(PI/2+a)),
-			Vector(0, math.sin(a), math.cos(a))
-		})
-
-		local new_slice = {}
-		for _, v in ipairs(slice) do -- Apply the matrix to each vector of the slice
-			table.insert(new_slice, Ray(rot_mat:vecmul(v)))
-		end
-		table.insert(self.rays, new_slice) -- rays is a table containing lines of rays
-	end
 
 	print("Generated "..tostring(#self.rays * #self.rays[1]).." rays in "..tostring(love.timer.getTime() - rays_create_s).."s")
 end

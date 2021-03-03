@@ -15,7 +15,7 @@ local rand = math.random
 if love and love.math then rand = love.math.random end
 
 -- makes a new ray with a direction vector
-local function new(dir)
+local function new(dir, pos)
 	return setmetatable({dir=dir or Vector(), pos=Vector()}, ray)
 end
 
@@ -49,11 +49,9 @@ function ray:get_color(objects)
 
 	if min_dist ~= math.huge then
 		return closest_o.c
-	elseif grad_d < 1 then -- Define outline color
-		local c = 0.5
+	else-- Define outline color
+		local c = Lerp(0.0, 0.5, 1 / math.max(grad_d, 0.5))
 		return {c, c, c}
-	else
-		return {0.0, 0.0, 0.0}
 	end
 end
 
