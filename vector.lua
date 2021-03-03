@@ -72,10 +72,9 @@ end
 
 -- set the magnitude of a vector
 function vector:setmag(mag)
-  self:norm()
-  local v = self * mag
+  local n = self:norm()
+  local v = n * mag
   self:replace(v)
-  return self
 end
 
 -- meta function to make vectors negative
@@ -143,9 +142,9 @@ end
 function vector:norm()
   local m = self:mag()
   if m~=0 then
-    self:replace(self / m)
+    return self / m
   end
-  return self
+  
 end
 
 -- limit the vector to a certain amount
