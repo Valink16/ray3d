@@ -24,7 +24,6 @@ local function new(res, fov)
 	local w, h = love.window.getMode()
 	c.real_res = Vector(w, h)
 	c.h_fov = fov -- Horizontal field of view
-	c.v_fov = fov / (res.x / res.y) -- Deduce vertical FOV using aspect ratio
 
 	local c = setmetatable(c, canvas)
 	c:reset_rays()
@@ -63,6 +62,8 @@ function canvas:clone()
 end
 
 function canvas:reset_rays()
+	self.v_fov = self.h_fov / (self.res.x / self.res.y) -- Deduce vertical FOV using aspect ratio
+
 	local rays_create_s = love.timer.getTime()
 	-- Rays generation
 	local slice = {} -- "Slice" if rays, represents a line of rays(aligned of the x axis) 

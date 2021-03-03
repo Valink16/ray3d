@@ -15,7 +15,7 @@ function love.load()
 
 	W, H = love.window.getMode()
 
-	Scale = 4
+	Scale = 2
 	Canvas = Canvas(Vector(W / Scale, H / Scale), math.pi * 2 * 90 / 360)
 
 	Objects = {
@@ -43,8 +43,8 @@ function love.update()
 	local mx, my = love.mouse.getPosition()
 	T = T + (1.0/60.0)
 
-	Objects[1].pos.x = Lerp(-5, 5, math.sin(T))
-	Objects[2].pos.x = Lerp(5, -5, math.sin(T))
+	Objects[1].pos.x = Lerp(-2, 2, math.sin(T))
+	Objects[2].pos.x = Lerp(2, -2, math.sin(T))
 
 	Objects[1].pos.z = Lerp(28, 32, math.cos(T))
 	Objects[2].pos.z = Lerp(32, 28, math.cos(T))
