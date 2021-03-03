@@ -66,8 +66,8 @@ function canvas:reset_rays()
 
 	local rays_create_s = love.timer.getTime()
 	-- Rays generation
-	local depth_w = (math.cos(self.v_fov / 2) * self.res.y) / (2 * math.sin(self.v_fov / 2))
-	
+	local depth_w = (math.cos(self.h_fov / 2) * self.res.x) / (2 * math.sin(self.h_fov / 2))
+
 	self.rays = {}
 	for y = -self.res.y / 2, self.res.y / 2 - 1 do
 		local slice = {} -- "Slice" if rays, represents a line of rays(aligned of the x axis) 

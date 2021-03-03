@@ -10,17 +10,21 @@ function Lerp(a, b, x)
 end
 
 function love.load()
-	love.window.setMode(1280, 720, {resizable=true})
+	love.window.setMode(800, 600, {resizable=true})
 	Draw_t = 0
 
 	W, H = love.window.getMode()
 
 	Scale = 2
-	Canvas = Canvas(Vector(W / Scale, H / Scale), math.pi * 2 * 120 / 360)
+	Canvas = Canvas(Vector(W / Scale, H / Scale), math.pi * 2 * 90 / 360)
+
+	print("Vertical FOV: "..tostring(Canvas.v_fov / (2 * PI) * 360))
 
 	Objects = {
-		Sphere(Vector(-5, 0, 28), 5, {0.5, 0.5, 0.0}),
-		Sphere(Vector(5, 0, 32), 5, {0.0, 0.0, 0.5}),
+		Sphere(Vector(-30, 0, 32), 3, {0.5, 0.5, 0.0}),
+		Sphere(Vector(30, 0, 28), 5, {0.0, 0.0, 0.5}),
+		Sphere(Vector(0, 10, 32), 3, {0.5, 0.0, 0.0}),
+		Sphere(Vector(0, -10, 28), 5, {0.0, 1.0, 0.0}),
 	}
 
 	T = 0
@@ -42,12 +46,18 @@ end
 function love.update()
 	local mx, my = love.mouse.getPosition()
 	T = T + (1.0/60.0)
+	
+	Objects[1].pos.x = Lerp(-5, 5, math.sin(T))
+	Objects[2].pos.x = Lerp(5, -5, math.sin(T))
 
-	Objects[1].pos.x = Lerp(-20, 20, math.sin(T))
-	Objects[2].pos.x = Lerp(20, -20, math.sin(T))
+	Objects[1].pos.z = Lerp(25, 35, math.cos(T))
+	Objects[2].pos.z = Lerp(35, 25, math.cos(T))
+	
+	Objects[3].pos.y = Lerp(10, -10, math.sin(T))
+	Objects[4].pos.y = Lerp(-10, 10, math.sin(T))
 
-	Objects[1].pos.z = Lerp(28, 32, math.cos(T))
-	Objects[2].pos.z = Lerp(32, 28, math.cos(T))
+	Objects[3].pos.z = Lerp(25, 35, math.cos(T))
+	Objects[4].pos.z = Lerp(35, 25, math.cos(T))
 
 	-- Objects[1].pos.y = Lerp(5, -5, math.sin(T))
 	-- Objects[2].pos.y = Lerp(-5, 5, math.sin(T))

@@ -49,9 +49,8 @@ function ray:get_color(objects)
 
 	if min_dist ~= math.huge then
 		return closest_o.c
-	else-- Define outline color
-		local c = Lerp(0.0, 0.5, 1 / math.max(grad_d, 0.5))
-		return {c, c, c}
+	else
+		return {0.0, 0.0, 0.0}
 	end
 end
 
