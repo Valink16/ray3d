@@ -143,8 +143,9 @@ function vector:norm()
   local m = self:mag()
   if m~=0 then
     return self / m
+  else
+    return Vector()
   end
-  
 end
 
 -- limit the vector to a certain amount

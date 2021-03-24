@@ -31,7 +31,7 @@ local function new(res, fov)
 end
 
 -- Main function to draw pixels using cast rays
-function canvas:draw(objects, scale)
+function canvas:draw(objects, lights, scale)
 	-- Draws a surface on screen with scale vector, if nil the surface is ajusted to fit the whole screen
 	local s = scale or Vector(self.real_res.x / self.res.x, self.real_res.y / self.res.y)
 	local pix_mode = (s.x == 1) and (s.y == 1)
@@ -41,10 +41,11 @@ function canvas:draw(objects, scale)
 	for y, line in ipairs(self.rays) do
 		for x, ray in ipairs(line) do
 			local ts = love.timer.getTime()
-			local c = ray:get_color(objects)
+			local c = ray:get_color(objects, lights)
 			avg_get_color_t = avg_get_color_t + (love.timer.getTime() - ts)
+			
+			love.graphics.setColor(c.x, c.y, c.z)
 
-			love.graphics.setColor(c)
 			if pix_mode then
 				love.graphics.points(x - 0.5, y - 0.5)
 			else
@@ -73,7 +74,7 @@ function canvas:reset_rays()
 		local slice = {} -- "Slice" if rays, represents a line of rays(aligned of the x axis) 
 		for x = -self.res.x / 2, self.res.x / 2 - 1 do
 			local dir = Vector(x, y, depth_w):norm()
-			table.insert(slice, Ray(dir, Vector()))
+			table.insert(slice, Ray(Vector(), dir))
 		end
 		table.insert(self.rays, slice)
 	end

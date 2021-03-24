@@ -1,10 +1,12 @@
+local util = require "util"
 local module = {
-	_version = "rays v0.1",
-	_description = "A class for raymarching",
+	_version = "ray v0.1",
+	_description = "A class for raytracing",
 }
 
 Vector = require "vector"
 Matrix = require "matrix"
+Util = require "util"
 
 -- create the module
 local ray = {}
@@ -15,46 +17,47 @@ local rand = math.random
 if love and love.math then rand = love.math.random end
 
 -- makes a new ray with a direction vector
-local function new(dir, pos)
-	return setmetatable({dir=dir or Vector(), pos=Vector()}, ray)
+local function new(pos, dir)
+	return setmetatable({dir=dir or Vector(), pos=pos or Vector()}, ray)
 end
 
--- check if an object is a matrix
+-- check if an object is a ray
 local function isray(t)
 	return getmetatable(t) == ray
 end
 
--- returns a copy of a matrix
+-- returns a copy of a ray
 function ray:clone()
-	return new(self.dir:clone())
+	return new(self.pos:clone(), self.dir:clone())
 end
 
-function ray:get_color(objects)
-	local grad_d = math.huge
+function ray:get_color(objects, lights, deb)
 	local min_dist = math.huge
 	local closest_o = nil
+	local closest_p = nil
 
 	for i, o in ipairs(objects) do
 		local col = o:collide(self)
-		if col[1] ~= nil then
-			local d = (col[1] - self.pos):magSq()
-			if d < min_dist then
-				min_dist = d
+		if col[2] ~= nil then
+			if col[1] < min_dist then
+				min_dist = col[1]
+				closest_p = col[2]
 				closest_o = o
 			end
-		elseif col[2] < grad_d then
-			grad_d = col[2]
 		end
 	end
 
 	if min_dist ~= math.huge then
-		return closest_o.c
+		-- local l = self:light(closest_p + (closest_p - closest_o.pos):norm() / 10, objects, lights, deb) -- shift outside the spehre a bit
+		local l = self:light(closest_p, objects, lights, deb) -- shift outside the spehre a bit
+		return l - (Vector(1.0, 1.0, 1.0, 1.0) * 0.9 - closest_o.c) -- Lighting, the seen color of an object is the color left after the object absorbs the other colors from the light
+		
 	else
-		return {0.0, 0.0, 0.0}
+		return Vector(0.0, 0.0, 0.0, 1.0)
 	end
 end
 
-function ray:get_color_march(objects)
+function ray:get_color_march(objects, deb)
 	local current = self.pos
 	local super_min = math.huge
 	local last_o = nil
@@ -71,7 +74,7 @@ function ray:get_color_march(objects)
 
 		if min_dist < super_min then super_min = min_dist end
 		
-		-- Translate the ray on it's direction by min_dist
+		-- Translate the ray on it's direction by `min_dist`
 		current = current + (self.dir * min_dist)
 		--print(min_dist)
 		if min_dist < 0.1 then -- impact
@@ -80,12 +83,42 @@ function ray:get_color_march(objects)
 	until (min_dist > 1000)
 
 	local grad = 1 / super_min
-	return {grad, grad, grad}
+	return Vector(grad, grad, grad, grad)
 end
 
+function ray:light(from, objects, lights, deb)
+	--[[ 
+		args:
+			- from : point which the lights are checked for, should be shifted a bit to the "outside", so shadows are correctly detected
+	--]]
+
+	for _, l in ipairs(lights) do
+		local light_ray = Ray(from, (l.pos - from):norm()) -- Fire a ray to check if it can reach the light
+		for _, o in ipairs(objects) do
+			local col = o:is_collide(light_ray)
+			if col ~= nil then
+				if math.max(col[1], col[2]) > 0.01 then -- If the biggest of the roots is positive, the new ray collides with an object which is not the object it bounced off
+					-- print("Shadow "..tostring(light_ray.dir))
+					return Vector(0, 0, 0, 1.0)
+				end
+			end
+		end
+
+		-- We'll be at this point if there is direct line of sight to the light
+		local a = math.acos(
+			light_ray.dir:dot(self.dir) / (light_ray.dir:mag() * self.dir:mag())
+		)
+
+		--print("DOT: "..tostring(light_ray.dir:dot(self.dir)).." A: "..tostring(util.rad_to_deg(a)))
+		
+		local cf = Util.lerp(0.0, 1.0, a / (math.pi * 2)) -- light color coefficient
+
+		return l.c * cf
+	end
+end
 
 -- meta function to check if rays have the same values
-function ray.__eq(a,b)
+function ray.__eq(a, b)
 	assert(isray(a) and isray(b), "eq: wrong argument types (expected <matrix> and <matrix>)")
 	return a.dir == b.dir
 end

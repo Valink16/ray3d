@@ -25,17 +25,36 @@ function sphere:dist(from)
 	return math.sqrt(dx*dx + dy*dy + dz*dz) - self.r
 end
 
+function sphere:is_collide(ray) -- Returns the scalar of ray dir for where it collides
+	-- a, b, c coefficients of a quadratic formula
+	local a = ray.dir.x*ray.dir.x + ray.dir.y*ray.dir.y + ray.dir.z*ray.dir.z
+	local b = 2 * ((ray.dir.x*ray.pos.x + ray.dir.y*ray.pos.y + ray.dir.z*ray.pos.z) - (ray.dir.x*self.pos.x + ray.dir.y*self.pos.y + ray.dir.z*self.pos.z))
+	local c = (self.pos.x*self.pos.x + self.pos.y*self.pos.y + self.pos.z*self.pos.z) - 2*(ray.pos.x*self.pos.x + ray.pos.y*self.pos.y + ray.pos.z*self.pos.z) + (ray.pos.x*ray.pos.x + ray.pos.y*ray.pos.y + ray.pos.z*ray.pos.z) - self.r*self.r
+	local delta = b*b - 4*a*c
+
+	local sq_delta = math.sqrt(delta)
+
+	if delta >= 0 then
+		return {
+			(-b-sq_delta) / (2*a),
+			(-b+sq_delta) / (2*a),
+		}
+	else
+		return nil
+	end	
+end
+
 function sphere:collide(ray) -- Returns the collision points with a ray
 	-- a, b, c coefficients of a quadratic formula
 	local a = ray.dir.x*ray.dir.x + ray.dir.y*ray.dir.y + ray.dir.z*ray.dir.z
 	local b = 2 * ((ray.dir.x*ray.pos.x + ray.dir.y*ray.pos.y + ray.dir.z*ray.pos.z) - (ray.dir.x*self.pos.x + ray.dir.y*self.pos.y + ray.dir.z*self.pos.z))
 	local c = (self.pos.x*self.pos.x + self.pos.y*self.pos.y + self.pos.z*self.pos.z) - 2*(ray.pos.x*self.pos.x + ray.pos.y*self.pos.y + ray.pos.z*self.pos.z) + (ray.pos.x*ray.pos.x + ray.pos.y*ray.pos.y + ray.pos.z*ray.pos.z) - self.r*self.r
 	local delta = b*b - 4*a*c
-	local mt = (-b) / (2*a)
+	local mt = (-b) / (2*a) -- Min dist
 	
 	if delta < 0 then
-		return {nil, a*mt*mt + b*mt + c}
-	elseif delta == 0 then return {ray.pos + ray.dir * (-b / (2 * a)), 0} end
+		return {mt, nil}
+	elseif delta == 0 then return {mt, ray.pos + ray.dir * mt} end
 
 	--[[
 	local sq_delta = math.sqrt(delta)
@@ -53,8 +72,8 @@ function sphere:collide(ray) -- Returns the collision points with a ray
 	local t = (-b-math.sqrt(delta)) / (2*a)
 
 	return {
-		ray.pos + ray.dir * t,
-		0
+		t,
+		ray.pos + ray.dir * t
 	}
 end
 
