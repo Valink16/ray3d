@@ -50,7 +50,7 @@ function ray:get_color(objects, lights, deb)
 	if min_dist ~= math.huge then
 		-- local l = self:light(closest_p + (closest_p - closest_o.pos):norm() / 10, objects, lights, deb) -- shift outside the spehre a bit
 		local l = self:light(closest_p, objects, lights, deb) -- shift outside the spehre a bit
-		return l - (Vector(1.0, 1.0, 1.0, 1.0) * 0.9 - closest_o.c) -- Lighting, the seen color of an object is the color left after the object absorbs the other colors from the light
+		return l - (Vector(1.0, 1.0, 1.0, 1.0) - closest_o.c) -- Lighting, the seen color of an object is the color left after the object absorbs the other colors from the light
 		
 	else
 		return Vector(0.0, 0.0, 0.0, 1.0)
@@ -91,30 +91,38 @@ function ray:light(from, objects, lights, deb)
 		args:
 			- from : point which the lights are checked for, should be shifted a bit to the "outside", so shadows are correctly detected
 	--]]
+	local c = Vector(0.0, 0.0, 0.0, 1.0)
 
 	for _, l in ipairs(lights) do
+		local tc = Vector(0.0, 0.0, 0.0, 1.0)
 		local light_ray = Ray(from, (l.pos - from):norm()) -- Fire a ray to check if it can reach the light
 		for _, o in ipairs(objects) do
 			local col = o:is_collide(light_ray)
 			if col ~= nil then
-				if math.max(col[1], col[2]) > 0.01 then -- If the biggest of the roots is positive, the new ray collides with an object which is not the object it bounced off
-					-- print("Shadow "..tostring(light_ray.dir))
-					return Vector(0, 0, 0, 1.0)
+				if math.max(col[1], col[2]) > 0.001 then -- If the biggest of the roots is positive, the new ray collides with an object which is not the object it bounced off
+					--print("Shadow "..tostring(light_ray.dir).." "..tostring(col[1]).." "..tostring(col[2]))
+					tc = Vector(0.0, 0.0, 0.0, 1.0)
+					goto endpoint
 				end
 			end
 		end
 
-		-- We'll be at this point if there is direct line of sight to the light
+		do 
+			-- We'll be at this point if there is direct line of sight to the light
 		local a = math.acos(
 			light_ray.dir:dot(self.dir) / (light_ray.dir:mag() * self.dir:mag())
 		)
 
-		--print("DOT: "..tostring(light_ray.dir:dot(self.dir)).." A: "..tostring(util.rad_to_deg(a)))
+			--print("DOT: "..tostring(light_ray.dir:dot(self.dir)).." A: "..tostring(util.rad_to_deg(a)))
+			local cf = Util.lerp(1.0, 0.0, a / (math.pi * 0.5)) -- light color coefficient
+			tc = l.c * cf
+		end
 		
-		local cf = Util.lerp(0.0, 1.0, a / (math.pi * 2)) -- light color coefficient
-
-		return l.c * cf
+		::endpoint::
+		c = c + tc
 	end
+
+	return c
 end
 
 -- meta function to check if rays have the same values

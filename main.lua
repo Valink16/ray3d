@@ -29,7 +29,9 @@ function love.load()
 	}
 
 	Lights = {
-		Light(Vector(-50, 0, 32), Vector(1.0, 1.0, 1.0, 1.0) * 3)
+		Light(Vector(-50, 0, 32), Vector(1.0, 1.0, 1.0, 1.0) * 5.0),
+		--Light(Vector(25, 0, 20), Vector(1.0, 1.0, 1.0, 1.0) * 5.0),
+		--Light(Vector(0, 0, -10), Vector(1.0, 1.0, 1.0, 1.0) * 2.0),
 	}
 
 	T = 0
