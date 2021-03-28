@@ -4,7 +4,13 @@ local module = {
 }
 
 function module.lerp(a, b, x)
-	return a + x * (b - a)
+	return a + (b - a) * x
+end
+
+function module.clamp(x, min, max)
+	if x < min then return min
+	elseif x > max then return max
+	else return x end
 end
 
 function module.rad_to_deg(r)

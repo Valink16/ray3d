@@ -13,7 +13,7 @@ matrix.__index = matrix
 local rand = math.random
 if love and love.math then rand = love.math.random end
 
--- makes a new n*m matrix where n are the columns(#vecs[1]) and m are the rows(#vecs)
+-- makes a new n*m matrix where n are the columns(#vecs[1]) and m are the rows(#vecs), row-major
 local function new(vecs)
 	return setmetatable(vecs, matrix)
 end
