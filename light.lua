@@ -1,5 +1,4 @@
 local module = {
-	_version = "light v0.1",
 	_description = "A class representing lights",
 }
 

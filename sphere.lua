@@ -1,5 +1,4 @@
 local module = {
-	_version = "objects v0.1",
 	_description = "A class to implement raytracing on spheres",
 }
 
@@ -32,6 +31,7 @@ function sphere:is_collide(ray) -- Returns the scalar of ray dir for where it co
 	local c = (self.pos.x*self.pos.x + self.pos.y*self.pos.y + self.pos.z*self.pos.z) - 2*(ray.pos.x*self.pos.x + ray.pos.y*self.pos.y + ray.pos.z*self.pos.z) + (ray.pos.x*ray.pos.x + ray.pos.y*ray.pos.y + ray.pos.z*ray.pos.z) - self.r*self.r
 	local delta = b*b - 4*a*c
 
+	-- local sq_delta = delta
 	local sq_delta = math.sqrt(delta)
 
 	if delta >= 0 then

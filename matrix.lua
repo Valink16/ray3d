@@ -1,5 +1,4 @@
 local module = {
-	_version = "matrix v1.0",
 	_description = "A simple class for matrix operations",
 }
 

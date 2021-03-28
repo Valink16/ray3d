@@ -1,6 +1,5 @@
-local util = require "util"
+local Util = require "util"
 local module = {
-	_version = "ray v0.1",
 	_description = "A class for raytracing",
 }
 
@@ -115,9 +114,9 @@ function ray:light(from, objects, lights, deb)
 
 			if a > PI then a = a - PI end
 			
-			--print("DOT: "..tostring(light_ray.dir:dot(self.dir)).." A: "..tostring(util.rad_to_deg(a)))
-			local cf = Util.clamp(Util.lerp(1.0, 0.0, a / math.pi), 0.0, 1.0) -- light color coefficient
-			--local cf = Util.lerp(1.0, 0.0, a / math.pi) -- light color coefficient
+			--print("DOT: "..tostring(light_ray.dir:dot(self.dir)).." A: "..tostring(Util.rad_to_deg(a)))
+			--local cf = Util.clamp(Util.flerp(1.0, 0.0, a / math.pi, Util.east_out), 0.0, 1.0) -- light color coefficient
+			local cf = Util.flerp(1.0, 0.0, a / math.pi, Util.east_out) -- light color coefficient
 			tc = l.c * cf
 		end
 		

@@ -1,10 +1,21 @@
 local module = {
-	_version = "util v0.1",
-	_description = "Module with useful general function",
+	_description = "Module with useful general functions"
 }
 
 function module.lerp(a, b, x)
 	return a + (b - a) * x
+end
+
+function module.flerp(a, b, x, f)
+	return module.lerp(a, b, f(x))
+end
+
+function module.ease_in(x)
+	return x * x
+end
+
+function module.east_out(x)
+	return math.sqrt(x)
 end
 
 function module.clamp(x, min, max)

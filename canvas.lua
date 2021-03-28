@@ -1,5 +1,4 @@
 local module = {
-	_version = "canvas v0.1",
 	_description = "Class that links the screen output with rays",
 }
 
