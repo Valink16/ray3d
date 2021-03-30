@@ -1,6 +1,7 @@
 use std::cmp::{max, min};
+use log::{debug, info, error, warn, trace};
 
-use glm::TVec3;
+use glm::Vec3;
 use nalgebra_glm as glm;
 use sfml::graphics::Color;
 use crate::ray::{self, Ray};
@@ -9,17 +10,20 @@ use crate::ray::{self, Ray};
 pub trait Trace {
 	/// Returns a distance from the `r`'s origin where the collision occurs 
 	fn trace(&self, r: &Ray) -> Option<f32>;
+	fn pos(&self) -> Vec3;
 	fn color(&self) -> Color;
+	fn mut_pos(&mut self) -> &mut Vec3;
+	fn mut_color(&mut self) -> &mut Color;
 }
 
 pub struct Sphere {
-	pub pos: TVec3<f32>,
+	pub pos: Vec3,
 	pub radius: f32,
 	pub color: Color
 }
 
 impl Sphere {
-	pub fn new(pos: TVec3<f32>, radius: f32, color: Color) -> Self {
+	pub fn new(pos: Vec3, radius: f32, color: Color) -> Self {
 		Self {
 			pos,
 			radius,
@@ -36,18 +40,18 @@ impl Trace for Sphere {
 		let c = (self.pos.x*self.pos.x + self.pos.y*self.pos.y + self.pos.z*self.pos.z) - 2.0 * (r.origin.x*self.pos.x + r.origin.y*self.pos.y + r.origin.z*self.pos.z) + (r.origin.x*r.origin.x + r.origin.y*r.origin.y + r.origin.z*r.origin.z) - self.radius*self.radius;
 		let delta = b*b - 4.0 * a * c;
 
-		let pres = 0.001;
-
 		if delta >= 0.0 {
 			let sq_delta = delta.sqrt();
-			// Return the smallest of roots which are positive
+
 			let t1 = (-b - sq_delta) / (2.0 * a);
 			let t2 = (-b + sq_delta) / (2.0 * a);
-			
-			if t1 > pres && t2 > pres {
+
+			let prec = 10e-5;
+
+			if t1 > prec {
 				Some(t1)
-			} else if t1.max(t2) > pres {
-				Some(t1.max(t2))
+			} else if t2 > prec {
+				Some(t2)
 			} else {
 				None
 			}
@@ -58,5 +62,17 @@ impl Trace for Sphere {
 
 	fn color(&self) -> Color {
 		self.color
+	}
+
+	fn pos(&self) -> Vec3 {
+		self.pos
+	}
+
+	fn mut_color(&mut self) -> &mut Color {
+		&mut self.color
+	}
+
+	fn mut_pos(&mut self) -> &mut Vec3 {
+		&mut self.pos
 	}
 }

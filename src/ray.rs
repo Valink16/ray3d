@@ -38,9 +38,30 @@ impl Ray {
 		}
 
 		if let Some(o) = closest_o {
-			o.color()
+			// trace!("Impact @ {}", closest_d);
+			let impact_point = closest_d * self.direction;
+			self.light(impact_point, objects, lights) - (Color::WHITE - o.color())
 		} else {
 			Color::BLACK
 		}
+	}
+
+	fn light(&self, impact_point: Vec3, objects: &Vec<Box<dyn Trace>>, lights: &Vec<Light>) -> Color {
+		let mut final_color = Color::BLACK; // This will contain the added color from potential multiple lights
+
+		'light_loop: for l in lights.iter() {
+			let to_light = l.position - impact_point;
+			let ray_to_light = Ray::new(impact_point, to_light);
+
+			for o in objects.iter() {
+				if let Some(d) = o.trace(&ray_to_light) { // Trace to light, if there's an object in between, that's a shadow
+					continue 'light_loop;
+				}
+			}
+
+			final_color += l.color;
+		}
+
+		final_color
 	}
 }

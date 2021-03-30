@@ -77,10 +77,12 @@ impl Canvas {
 		let mut scaled_state = RenderStates::default();
 		scaled_state.transform.scale(self.scale.x, self.scale.y);
 		sprite.draw(&mut self.window, scaled_state);
-		
-		self.window.display();
 
 		(draw_start.elapsed().as_secs_f32(), ray_t.as_secs_f32())
+	}
+
+	pub fn display(&mut self) {
+		self.window.display();
 	}
 	
 	/// Resets the rays and scalars, should be used whenever `self.res` is changed or window is resized
