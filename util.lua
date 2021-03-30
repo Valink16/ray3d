@@ -15,7 +15,7 @@ function module.ease_in(x)
 end
 
 function module.east_out(x)
-	return math.sqrt(x)
+	return math.pow(x, 1/2)
 end
 
 function module.clamp(x, min, max)

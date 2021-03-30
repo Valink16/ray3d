@@ -10,7 +10,7 @@ PI = math.pi
 Lerp = Util.lerp
 
 function love.load()
-	love.window.setMode(800, 600, {resizable=true})
+	love.window.setMode(800, 600, {usedpiscale=false})
 	Draw_t = 0
 
 	W, H = love.window.getMode()
@@ -26,11 +26,13 @@ function love.load()
 		-- Sphere(Vector(0, 10, 32), 3, Vector(0.5, 0.0, 0.0)),
 		-- Sphere(Vector(0, -10, 28), 5, Vector(0.0, 1.0, 0.0)),
 	}
+	
+	local gi = 50
 
 	Lights = {
-		Light(Vector(-5, 5, 10), Vector(1.0, 0.0, 0.0, 1.0) * 1.0),
-		Light(Vector(0, -5, 10), Vector(0.0, 1.0, 0.0, 1.0) * 1.0),
-		Light(Vector(5, 5, 10), Vector(0.0, 0.0, 1.0, 1.0) * 1.0),
+		Light(Vector(-3.5, 3.5, 10), gi * Vector(1.0, 0.0, 0.0, 1.0) * 1.0),
+		--Light(Vector(0, -5, 10), gi * Vector(0.0, 1.0, 0.0, 1.0) * 1.0),
+		Light(Vector(3.5, 3.5, 10), gi * Vector(0.0, 0.0, 1.0, 1.0) * 1.0),
 	}
 
 	T = 0
@@ -59,8 +61,8 @@ function love.update()
 	Objects[2].pos.x = Lerp(0, 10, -math.sin(T * 4))
 	Objects[2].pos.z = Lerp(20, 25, math.cos(T * 4))
 
-	-- Lights[1].pos.z = math.cos(T * 4) * 10 + 6
-	-- Lights[1].pos.x = -math.sin(T * 4) * 30
+	--Lights[2].pos.z = math.cos(T * 4) * 5 + 15
+	--Lights[2].pos.x = -math.sin(T * 4) * 5
 	
 	--[[
 	Objects[1].pos.x = Lerp(-5, 5, math.sin(T))

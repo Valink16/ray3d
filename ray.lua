@@ -48,7 +48,7 @@ function ray:get_color(objects, lights, deb)
 
 	if min_dist ~= math.huge then
 		-- local l = self:light(closest_p + (closest_p - closest_o.pos):norm() / 10, objects, lights, deb) -- shift outside the spehre a bit
-		local l = self:light(closest_p, objects, lights, deb) -- shift outside the spehre a bit
+		local l = self:light(closest_p, objects, lights, closest_o) -- shift outside the spehre a bit
 		return l - (Vector(1.0, 1.0, 1.0, 1.0) - closest_o.c) -- Lighting, the seen color of an object is the color left after the object absorbs the other colors from the light
 		
 	else
@@ -85,7 +85,7 @@ function ray:get_color_march(objects, deb)
 	return Vector(grad, grad, grad, grad)
 end
 
-function ray:light(from, objects, lights, deb)
+function ray:light(from, objects, lights, closest_o)
 	--[[ 
 		args:
 			- from : point which the lights are checked for, should be shifted a bit to the "outside", so shadows are correctly detected
@@ -108,8 +108,13 @@ function ray:light(from, objects, lights, deb)
 
 		do 
 			-- We'll be at this point if there is direct line of sight to the light
+			local normal = from - closest_o.pos
+			--local a = math.acos(
+				--light_ray.dir:dot(-self.dir) / (light_ray.dir:mag() * (-self.dir):mag())
+			--)
+			
 			local a = math.acos(
-				light_ray.dir:dot(-self.dir) / (light_ray.dir:mag() * (-self.dir):mag())
+				light_ray.dir:dot(normal) / (light_ray.dir:mag() * (normal):mag())
 			)
 
 			if a > PI then a = a - PI end
@@ -117,7 +122,9 @@ function ray:light(from, objects, lights, deb)
 			--print("DOT: "..tostring(light_ray.dir:dot(self.dir)).." A: "..tostring(Util.rad_to_deg(a)))
 			--local cf = Util.clamp(Util.flerp(1.0, 0.0, a / math.pi, Util.east_out), 0.0, 1.0) -- light color coefficient
 			local cf = Util.flerp(1.0, 0.0, a / math.pi, Util.east_out) -- light color coefficient
-			tc = l.c * cf
+			local d = (from - l.pos):mag()
+			local dcf = 1 / (d*d) -- Distance coefficient, computed from the inverse square law for luminance
+			tc = l.c * dcf
 		end
 		
 		::endpoint::
